@@ -57,8 +57,8 @@ function setState(){
     if (in_array($matchUser['user_id'], $ticked)) {
         ob_start();
         include 'chat.php';
-        $surpress = sortByType('create', $response["fb_id"]);
-        $output = array('1', $response, $surpress);
+        $surpress = sortByType('create', $matchUser["fb_id"]);
+        $output = array('1', $matchUser, $surpress);
         ob_end_clean();
     }
     echo json_encode($output);

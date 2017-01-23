@@ -67,22 +67,27 @@ function sortByType($req_type, $contact_id){
         }
         if ($req_type == 'create'){
             //code to be executed if req=create
-            if ($user_id != $contact_id){
-                //Create new row for conversation
-                $chat_query = "INSERT INTO active_conversations (user_1, user_2) VALUES ('".$user_id."', '".$contact_id."')";
-                $conn->query($chat_query);
+            $sqlquery = "SELECT * FROM active_conversations WHERE user_1 = '".$user_id."' AND user_2 = '".$contact_id."' OR user_1 = '".$contact_id."' AND user_2 = '".$user_id."'";
+            $usersChats = $conn->query($sqlquery);
+            $userChats = $usersChats->fetch_assoc();
+            if (count($userChats) == 0) {
+                if ($user_id != $contact_id){
+                    //Create new row for conversation
+                    $chat_query = "INSERT INTO active_conversations (user_1, user_2) VALUES ('".$user_id."', '".$contact_id."')";
+                    $conn->query($chat_query);
 
-                //Get the ID of the row
-                $conversation_id = mysql_insert_id();
+                    //Get the ID of the row
+                    $conversation_id = @mysql_insert_id();
 
-                //Add the conversation ID to the actioners row
-                $chat_query = "UPDATE user_data SET active_conversations = CONCAT(active_conversations, '".$conversation_id."') WHERE fb_id ='".$user_id."'";
-                $conn->query($chat_query);
+                    //Add the conversation ID to the actioners row
+                    $chat_query = "UPDATE user_data SET active_conversations = CONCAT(active_conversations, '".$conversation_id."') WHERE fb_id ='".$user_id."'";
+                    $conn->query($chat_query);
 
-                //Add the conversation ID to the recievers account
-                $chat_query = "UPDATE user_data SET active_conversations = CONCAT(active_conversations, '".$conversation_id."') WHERE fb_id ='".$contact_id."'";
-                $conn->query($chat_query);
-                $output = '1';
+                    //Add the conversation ID to the recievers account
+                    $chat_query = "UPDATE user_data SET active_conversations = CONCAT(active_conversations, '".$conversation_id."') WHERE fb_id ='".$contact_id."'";
+                    $conn->query($chat_query);
+                    $output = '1';
+                }
             }
         }
             if ($req_type ==  'delete'){
